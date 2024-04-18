@@ -1,6 +1,13 @@
 import { HttpClientService } from './http.client.service.js'
 
 export class GoodsExtractionService {
+
+    /**
+     * 
+     * @param {string} url 
+     * @param {string} productSubstring 
+     * @returns []
+     */
     async loadProductValues(url, productSubstring) {
         const httpClientService = new HttpClientService()
         //console.log({ productSubstring })

@@ -6,6 +6,7 @@ const app = express()
 import { GoodsExtractionService } from './services/goods.extraction.service.js'
 //import { server } from './api/index.js'
 import testRoute from './api/routes/testRoute.js'
+import telegram from './services/telegram.js'
 app.use('/flags', express.static('public'))
 app.use('/test1', testRoute)
 app.use((err, req, res, next) => {
@@ -29,7 +30,12 @@ const goodsInitial = [
         url: 'https://www.atbmarket.com/product/morozivo-100-g-oliver-smith-lakomij-plombir-u-zbitij-konditerskij-glazuri',
         titleOpenTag: '<h1 class="page-title product-page__title">',
         title: 'Морозиво 100  г Oliver Smith Лакомий пломбір у збитій кондитерській глазурі'
-    }
+    },
+    {
+        url: 'https://www.atbmarket.com/product/ikra-310-g-veres-z-kabackiv-ekstra-skbanka',
+        titleOpenTag: '<h1 class="page-title product-page__title">',
+        title: 'Ікра 310 г Верес з кабачків Екстра ск/банка'
+    },
 ]
 
 monitor().catch((error) => console.log(error))
@@ -51,7 +57,12 @@ async function monitor() {
     )
     let index = 0
     const updatedGoods = goodsInitial.map(({ url, title }) => {
-        return `${url}  : ${values[index++]}`
+        const goodInfo = `${url}  : ${values[index]}`
+        if (values[index]?.length > 1) {
+           telegram.log(goodInfo)
+        }
+        index++
+        return goodInfo
     })
     console.log({ updatedGoods })
     return updatedGoods
