@@ -1,5 +1,7 @@
 import { HttpClientService } from './http.client.service.js'
 
+const NOTAVAILABLE_TEXT = 'Немає в наявності'
+
 export class GoodsExtractionService {
 
     /**
@@ -12,6 +14,9 @@ export class GoodsExtractionService {
         const httpClientService = new HttpClientService()
         //console.log({ productSubstring })
         const htmlSource = await httpClientService.getProductPageHtml(url)
+        if(this.isProductNonAvailable(htmlSource)) {
+            return 'Not available at the moment'
+        }
         const indexProductTitle = htmlSource.indexOf(productSubstring)
         const productOpenDivIndex = htmlSource.indexOf('<div', indexProductTitle)
         const productDivCloseIndex = this.findClosingTagIndex(htmlSource, productOpenDivIndex)
@@ -22,6 +27,13 @@ export class GoodsExtractionService {
         //console.log({ indexProductTitle, productOpenDivIndex, productDivCloseIndex })
         const productHtmlBlock = htmlSource.substring(productOpenDivIndex, productDivCloseIndex)
         return this.extractValues(productHtmlBlock)
+    }
+
+    /**
+     * @param {string} htmlSource
+     */
+    isProductNonAvailable(htmlSource) {
+        return htmlSource.includes(NOTAVAILABLE_TEXT)
     }
 
     /**
