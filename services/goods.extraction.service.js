@@ -1,4 +1,4 @@
-import { HttpClientService } from './http.client.service.js'
+const { HttpClientService } = require('./http.client.service.js')
 
 const NOTAVAILABLE_TEXT = 'Немає в наявності'
 
@@ -33,7 +33,8 @@ export class GoodsExtractionService {
      * @param {string} htmlSource
      */
     isProductNonAvailable(htmlSource) {
-        return htmlSource.includes(NOTAVAILABLE_TEXT)
+        //console.log(htmlSource)
+        return false//htmlSource.includes(NOTAVAILABLE_TEXT)
     }
 
     /**

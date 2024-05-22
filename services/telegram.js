@@ -1,4 +1,4 @@
-import https from 'https'
+const https = require('https') //import https from 'https'
 
 const apiUrl = 'api.telegram.org/bot'
 const botId = ''
