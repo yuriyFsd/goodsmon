@@ -68,9 +68,9 @@ async function monitor() {
     return updatedGoods
 }
 
-// app.get('/', async (req, res) => {
-//     res.send(await monitor())
-// })
+app.get('/', async (req, res) => {
+    res.send(await monitor())
+})
 
 app.listen(port, async () => {
     console.log(port + ' is listening ok!!! ')
