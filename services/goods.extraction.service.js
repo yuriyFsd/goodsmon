@@ -9,6 +9,8 @@ export class GoodsExtractionService {
      * @returns []
      */
     async loadProductValues(url, productSubstring) {
+        const productNotFoundMessage = "Can't find product block!"
+        const priceNotFoundMessage = "Can't find cost, maybe not available!"
         const httpClientService = new HttpClientService()
         //console.log({ productSubstring })
         const htmlSource = await httpClientService.getProductPageHtml(url)
@@ -17,11 +19,13 @@ export class GoodsExtractionService {
         const productDivCloseIndex = this.findClosingTagIndex(htmlSource, productOpenDivIndex)
 
         if (indexProductTitle < 0 || productOpenDivIndex < 0 || productDivCloseIndex < 0) {
-            return "Can't find product block!"
+            return productNotFoundMessage
         }
-        //console.log({ indexProductTitle, productOpenDivIndex, productDivCloseIndex })
+        console.log({ indexProductTitle, productOpenDivIndex, productDivCloseIndex })
         const productHtmlBlock = htmlSource.substring(productOpenDivIndex, productDivCloseIndex)
-        return this.extractValues(productHtmlBlock)
+        const productCost = this.extractValues(productHtmlBlock)
+        console.log({pr: typeof productCost[0]})
+        return productCost[0] > 1000000 ? priceNotFoundMessage : productCost
     }
 
     /**
@@ -54,6 +58,7 @@ export class GoodsExtractionService {
 
     /**
      * @param {string} htmlString
+     * returns []
      */
     extractValues(htmlString) {
         const matches = htmlString.match(/>\d+\.|>\d+/gm)
