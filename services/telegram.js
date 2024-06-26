@@ -1,8 +1,9 @@
-const https = require('https') //import https from 'https'
+import https from 'https'
+import 'dotenv/config'
 
 const apiUrl = 'api.telegram.org/bot'
-const botId = ''
-const chatId = ''
+const botId = process.env.TG_BOT_TK
+const chatId = process.env.TG_CHAT_ID
 
 class TelegramLogger {
     l(message) {

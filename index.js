@@ -13,7 +13,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('test error')
 })
-const port = 3000
+const port = process.env.PORT || 4000;
+const runTimeRange = process.env.APP_TIME_RANGE || '*/10 * * * *'
 
 const goodsInitial = [
   {
@@ -41,37 +42,37 @@ const goodsInitial = [
 
 monitor().catch((error) => console.log(error))
 
-// cron.schedule('* * * * *', () => {
-//     logMessage()
-//     toRunByCrone()
-// })
+cron.schedule(runTimeRange, () => {
+    logMessage()
+    monitor()
+})
 function logMessage() {
   console.log('Cron job executed at:', new Date().toLocaleString())
 }
 
 async function monitor() {
-  const goodsExtractionService = new GoodsExtractionService()
-  const values = await Promise.all(
-    goodsInitial.map(({ url, titleOpenTag, title }) => {
-      return goodsExtractionService.loadProductValues(url, titleOpenTag.concat(title))
+    const goodsExtractionService = new GoodsExtractionService()
+    const values = await Promise.all(
+        goodsInitial.map(({ url, titleOpenTag, title }) => {
+            return goodsExtractionService.loadProductValues(url, titleOpenTag.concat(title))
+        })
+    )
+    let index = 0
+    const updatedGoods = goodsInitial.map(({ url, title }) => {
+        const goodInfo = `${url}  : ${values[index]}`
+        if (typeof values[index] === 'object' && values[index]?.length > 1) {
+            telegram.log(goodInfo)
+        }
+        index++
+        return goodInfo
     })
-  )
-  let index = 0
-  const updatedGoods = goodsInitial.map(({ url, title }) => {
-    const goodInfo = `${url}  : ${values[index]}`
-    if (values[index]?.length > 1) {
-      telegram.log(goodInfo)
-    }
-    index++
-    return goodInfo
-  })
-  console.log({ updatedGoods })
-  return updatedGoods
+    console.log({ updatedGoods })
+    return updatedGoods
 }
 
-// app.get('/', async (req, res) => {
-//     res.send(await monitor())
-// })
+app.get('/', async (req, res) => {
+    res.send(await monitor())
+})
 
 app.listen(port, async () => {
   console.log(port + ' is listening ok!!! ')
