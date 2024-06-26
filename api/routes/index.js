@@ -1,4 +1,4 @@
-import * as products from './products.js'
+const products = require('./products.js')
 
 const routes = [products.router]
 export { routes }

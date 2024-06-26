@@ -1,4 +1,4 @@
-import { Router } from 'express' //, Request, Response, NextFunction
+const { Router } = require('express') //, Request, Response, NextFunction
 
 const router = Router()
 

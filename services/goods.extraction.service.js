@@ -1,4 +1,6 @@
-import { HttpClientService } from './http.client.service.js'
+const { HttpClientService } = require('./http.client.service.js')
+
+const NOTAVAILABLE_TEXT = 'Немає в наявності'
 
 export class GoodsExtractionService {
 
@@ -14,6 +16,9 @@ export class GoodsExtractionService {
         const httpClientService = new HttpClientService()
         //console.log({ productSubstring })
         const htmlSource = await httpClientService.getProductPageHtml(url)
+        if(this.isProductNonAvailable(htmlSource)) {
+            return 'Not available at the moment'
+        }
         const indexProductTitle = htmlSource.indexOf(productSubstring)
         const productOpenDivIndex = htmlSource.indexOf('<div', indexProductTitle)
         const productDivCloseIndex = this.findClosingTagIndex(htmlSource, productOpenDivIndex)
@@ -26,6 +31,14 @@ export class GoodsExtractionService {
         const productCost = this.extractValues(productHtmlBlock)
         console.log({pr: typeof productCost[0]})
         return productCost[0] > 1000000 ? priceNotFoundMessage : productCost
+    }
+
+    /**
+     * @param {string} htmlSource
+     */
+    isProductNonAvailable(htmlSource) {
+        //console.log(htmlSource)
+        return false//htmlSource.includes(NOTAVAILABLE_TEXT)
     }
 
     /**
