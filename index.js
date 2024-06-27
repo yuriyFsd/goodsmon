@@ -1,12 +1,12 @@
 //import fetch from 'node-fetch'
 //const fetch = require('node-fetch')
-const express = require('express')
-const cron = require ('node-cron')
+import express from 'express'
+import cron from 'node-cron'
 const app = express()
-const { GoodsExtractionService } = require('./services/goods.extraction.service.js')
+import { GoodsExtractionService } from './services/goods.extraction.service.js'
 //import { server } from './api/index.js'
-const testRoute = require('./api/routes/testRoute.js')
-const telegram = require('./services/telegram.js')
+import testRoute from './api/routes/testRoute.js'
+import telegram from './services/telegram.js'
 app.use('/flags', express.static('public'))
 app.use('/test1', testRoute)
 app.use((err, req, res, next) => {
