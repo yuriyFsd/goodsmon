@@ -1,6 +1,6 @@
-const { HttpClientService } = require('./http.client.service.js')
+import { HttpClientService } from './http.client.service.js'
 
-const NOTAVAILABLE_TEXT = 'Немає в наявності'
+const NOTAVAILABLE_TEXT = 'Not available at the moment'
 
 export class GoodsExtractionService {
 
@@ -17,7 +17,7 @@ export class GoodsExtractionService {
         //console.log({ productSubstring })
         const htmlSource = await httpClientService.getProductPageHtml(url)
         if(this.isProductNonAvailable(htmlSource)) {
-            return 'Not available at the moment'
+            return NOTAVAILABLE_TEXT
         }
         const indexProductTitle = htmlSource.indexOf(productSubstring)
         const productOpenDivIndex = htmlSource.indexOf('<div', indexProductTitle)

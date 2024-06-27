@@ -1,4 +1,4 @@
-const fetch = require('node-fetch') //import fetch from 'node-fetch'
+import fetch from 'node-fetch' //import fetch from 'node-fetch'
 
 export class HttpClientService {
     async getProductPageHtml(url) {
