@@ -1,6 +1,6 @@
 import { HttpClientService } from './http.client.service.js'
 
-const NOTAVAILABLE_TEXT = 'Not available at the moment'
+const NOTAVAILABLE_TEXT = 'Немає в наявності'
 
 export class GoodsExtractionService {
 
@@ -14,10 +14,9 @@ export class GoodsExtractionService {
         const productNotFoundMessage = "Can't find product block!"
         const priceNotFoundMessage = "Can't find cost, maybe not available!"
         const httpClientService = new HttpClientService()
-        //console.log({ productSubstring })
         const htmlSource = await httpClientService.getProductPageHtml(url)
         if(this.isProductNonAvailable(htmlSource)) {
-            return NOTAVAILABLE_TEXT
+            return 'Not available at the moment'
         }
         const indexProductTitle = htmlSource.indexOf(productSubstring)
         const productOpenDivIndex = htmlSource.indexOf('<div', indexProductTitle)
@@ -26,10 +25,8 @@ export class GoodsExtractionService {
         if (indexProductTitle < 0 || productOpenDivIndex < 0 || productDivCloseIndex < 0) {
             return productNotFoundMessage
         }
-        console.log({ indexProductTitle, productOpenDivIndex, productDivCloseIndex })
         const productHtmlBlock = htmlSource.substring(productOpenDivIndex, productDivCloseIndex)
         const productCost = this.extractValues(productHtmlBlock)
-        console.log({pr: typeof productCost[0]})
         return productCost[0] > 1000000 ? priceNotFoundMessage : productCost
     }
 
@@ -37,8 +34,7 @@ export class GoodsExtractionService {
      * @param {string} htmlSource
      */
     isProductNonAvailable(htmlSource) {
-        //console.log(htmlSource)
-        return false//htmlSource.includes(NOTAVAILABLE_TEXT)
+        return htmlSource.includes(NOTAVAILABLE_TEXT)
     }
 
     /**
@@ -75,7 +71,6 @@ export class GoodsExtractionService {
      */
     extractValues(htmlString) {
         const matches = htmlString.match(/>\d+\.|>\d+/gm)
-        //console.log({ matches })
         const values = []
         matches?.reduce((prevVal, currentVal, index) => {
             if (index % 2 === 1) {
@@ -85,8 +80,6 @@ export class GoodsExtractionService {
             }
             return currentVal
         })
-        console.log(values)
         return values
-        //return matches ? parseFloat(matches[0] + matches[1]) : null
     }
 }
