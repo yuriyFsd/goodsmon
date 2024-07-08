@@ -5,10 +5,10 @@ import cron from 'node-cron'
 const app = express()
 import { GoodsExtractionService } from './services/goods.extraction.service.js'
 //import { server } from './api/index.js'
-import testRoute from './api/routes/testRoute.js'
+import auxiliaryApi from './api/routes/auxiliary.js'
 import telegram from './services/telegram.js'
 app.use('/flags', express.static('public'))
-app.use('/test1', testRoute)
+app.use('/api', auxiliaryApi)
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('test error')
