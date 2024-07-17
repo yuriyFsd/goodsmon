@@ -37,6 +37,11 @@ const goodsInitial = [
     url: 'https://www.atbmarket.com/product/ikra-310-g-veres-z-kabackiv-ekstra-skbanka',
     titleOpenTag: '<h1 class="page-title product-page__title">',
     title: 'Ікра 310 г Верес з кабачків Екстра ск/банка'
+  },
+  {
+    url: 'https://www.atbmarket.com/product/morozivo-70g-rud-100-morozivo',
+    titleOpenTag: '<h1 class="page-title product-page__title">',
+    title: 'Морозиво 70г Рудь 100% морозиво'
   }
 ]
 
