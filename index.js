@@ -40,6 +40,12 @@ async function getProducts() {
     })
   )
 }
+
+/**
+ * Monitors the initial products and updates them based on the actual product information.
+ *
+ * @return {Promise<Array<string>>} An array of strings containing the updated product information.
+ */
 async function monitor() {
   const goodsInitial = await getProducts()
   const actualInfo = await getActualGoodsInfo(goodsInitial)

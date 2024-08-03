@@ -1,4 +1,5 @@
 import { HttpClientService } from './http.client.service.js'
+//import { writeFile } from 'node:fs/promises'
 
 const NOTAVAILABLE_TEXT = 'Немає в наявності'
 
@@ -16,13 +17,14 @@ export class GoodsExtractionService {
 
     const httpClientService = new HttpClientService()
     const htmlSource = await httpClientService.getProductPageHtml(url)
+    //await writeFile('goods.html', htmlSource, 'utf8')
     if (this.isProductNonAvailable(htmlSource)) {
       return { status: 'Not available at the moment' }
     }
     const indexProductTitle = htmlSource.indexOf(productSubstring)
     const productOpenDivIndex = htmlSource.indexOf('<div', indexProductTitle)
     const productDivCloseIndex = this.findClosingTagIndex(htmlSource, productOpenDivIndex)
-
+    console.log({ indexProductTitle, productOpenDivIndex, productDivCloseIndex })
     if (indexProductTitle < 0 || productOpenDivIndex < 0 || productDivCloseIndex < 0) {
       return { status: productNotFoundMessage }
     }
