@@ -1,0 +1,23 @@
+Send product alert only if price has been changed
+1. store product info to db: url, title, prices, status (maybe separate table with statuses), update time
+2. compare current price with stored, if changed - send alert and update status and time
+
+{
+  category: id
+  title: '',
+  vendor_domain: '',
+  url: '',
+  prices: [],
+  last_update_time: time,
+  status: id
+}
+
+category: {
+  
+}
+
+status: {
+  on discount,
+  not available,
+  regular price
+}
