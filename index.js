@@ -2,17 +2,30 @@
 //const fetch = require('node-fetch')
 import express from 'express'
 import cron from 'node-cron'
+import path from 'path'
+import bodyParser from 'body-parser'
+import { fileURLToPath } from 'url'
 const app = express()
 import { GoodsExtractionService } from './services/goods.extraction.service.js'
 //import { server } from './api/index.js'
 import auxiliaryApi from './api/routes/auxiliary.js'
 import telegram from './services/telegram.js'
+import { ManageGoodsService } from './services/manage.goods.service.js'
 app.use('/flags', express.static('public'))
 app.use('/api', auxiliaryApi)
+// Middleware to parse form data
+app.use(bodyParser.urlencoded({ extended: true }))
+
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('test error')
 })
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directo
+app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static('/public')) //app.use(express.static(__dirname + '/public'))
+
 const port = process.env.PORT || 4000;
 const runTimeRange = process.env.APP_TIME_RANGE || '*/10 * * * *'
 
@@ -72,6 +85,23 @@ async function monitor() {
 
 app.get('/', async (req, res) => {
     res.send(await monitor())
+})
+
+app.get('/test', (req, res) => {
+   console.log(__dirname)
+  res.sendFile(path.join(__dirname, 'public', '/test.html'))
+})
+
+app.post('/submit', (req, res) => {
+  console.log('submit post!!!')
+  const prodUrl = req.body.product_url
+  const prodTitle = req.body.product_title
+  const manageGoodsService = new ManageGoodsService
+  if (manageGoodsService.addNewProduct(prodUrl, prodTitle)) {
+    res.send(` ${prodTitle} stored!`)
+  } else {
+    res.send(` ${prodTitle} NOT stored!`)
+  }  
 })
 
 app.listen(port, async () => {
