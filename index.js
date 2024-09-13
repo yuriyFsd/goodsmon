@@ -49,27 +49,31 @@ async function getProducts() {
 async function monitor() {
   const goodsInitial = await getProducts()
   const actualInfo = await getActualGoodsInfo(goodsInitial)
-  let index = 0
 
-  const updatedGoods = goodsInitial.map(async ({ url, title, prices, status }) => {
+  const updatedGoods = goodsInitial.map(async ({ url, title, prices, status }, index) => {
     const goodInfo = `${url}  : ${actualInfo[index].status} ${actualInfo[index]?.prices || ''}`
     if (actualInfo[index]?.prices &&
       actualInfo[index].prices?.length > 1 &&
       prices.toString() !== actualInfo[index].prices.toString()
     ) {
-      telegram.log(goodInfo)
-      goodsStoreService.updateProductsInStorage(url, {prices: actualInfo[index].prices})
-      goodsStoreService.updateProductsInStorage(url, { status: actualInfo[index].status })
+      processDiscountedProduct(url, goodInfo, actualInfo[index])
     } else if (status !== actualInfo[index].status) { //if no discount but status updated
-      telegram.log(goodInfo)
-      goodsStoreService.updateProductsInStorage(url, {
-        status: actualInfo[index].status
-      })
+      processUpdatedProduct(url, goodInfo, actualInfo[index])
     }
-    index++
     return goodInfo
   })
   return await Promise.all(updatedGoods)
+}
+
+function processDiscountedProduct(url, goodInfo, { prices, status }) {
+  telegram.log(goodInfo)
+  goodsStoreService.updateProductsInStorage(url, { prices })
+  goodsStoreService.updateProductsInStorage(url, { status })
+}
+
+function processUpdatedProduct(url, goodInfo, { status }) {
+  telegram.log(goodInfo)
+  goodsStoreService.updateProductsInStorage(url, { status })
 }
 
 app.get('/', async (req, res) => {

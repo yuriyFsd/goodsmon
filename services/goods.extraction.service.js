@@ -2,6 +2,7 @@ import { HttpClientService } from './http.client.service.js'
 //import { writeFile } from 'node:fs/promises'
 
 const NOTAVAILABLE_TEXT = 'Немає в наявності'
+const COST_UPPER_LIMIT = 1000000
 
 export class GoodsExtractionService {
   /**
@@ -31,7 +32,7 @@ export class GoodsExtractionService {
     const productHtmlBlock = htmlSource.substring(productOpenDivIndex, productDivCloseIndex)
     const productCost = this.extractValues(productHtmlBlock)
 
-    if (productCost[0] > 1000000) {
+    if (productCost[0] > COST_UPPER_LIMIT) {
       return { status: priceNotFoundMessage }
     }
     return {
@@ -71,8 +72,7 @@ export class GoodsExtractionService {
         }
       }
     }
-    // If no closing tag is found
-    return -1
+    return -1 //no closing tag is found
   }
 
   /**
