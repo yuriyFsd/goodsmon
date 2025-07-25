@@ -9,6 +9,7 @@ const host = process.env.APP_DB_HOST
 const dbName = process.env.APP_DB_NAME
 const dbProject = process.env.APP_DB_PROJECT 
 const url = `mongodb+srv://${user}:${pass}@${host}/${dbProject}?retryWrites=true&w=majority&appName=Cluster0`
+// console.log(url)
 const mongoClient = new MongoClient(url)
 
 async function connect() {

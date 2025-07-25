@@ -21,6 +21,14 @@ export class GoodsStoreMapper {
       .updateOne({ url: productUrl }, { $set: { ...productProperty, updated: new Date() } })
     return updateResult
   }
+
+  async addNewProduct(productUrl, productTitle, productTitleOpenTag) {
+    const insertResult = await mongodb
+      .db()
+      .collection('goods')
+      .insertOne({ url: productUrl, title: productTitle, titleOpenTag: productTitleOpenTag, updated: new Date() })
+    return insertResult
+  }
 }
 
 //const goodsStoreMapper = new GoodsStoreMapper()
