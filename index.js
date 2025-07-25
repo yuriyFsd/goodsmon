@@ -3,7 +3,15 @@
 import express from 'express'
 import cron from 'node-cron'
 const app = express()
+app.use(express.urlencoded({ extended: true }));
+
 import { GoodsExtractionService } from './services/goods.extraction.service.js'
+import { GoodsStoreService } from './services/goods.store.service.js'
+
+import path from 'path'
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 //import { server } from './api/index.js'
 import auxiliaryApi from './api/routes/auxiliary.js'
 import telegram from './services/telegram.js'
@@ -13,67 +21,84 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('test error')
 })
-const port = process.env.PORT || 4000;
-const runTimeRange = process.env.APP_TIME_RANGE || '*/10 * * * *'
+const port = process.env.PORT || 4000
+const runTimeRange = process.env.APP_TIME_RANGE || '*/1 * * * *'
+const goodsStoreService = new GoodsStoreService()
 
-const goodsInitial = [
-  {
-    url: 'https://www.atbmarket.com/product/morozivo-90-g-svoa-linia-briket-mup',
-    titleOpenTag: '<h1 class="page-title product-page__title">',
-    title: 'Морозиво 90 г Своя лінія Брикет м/уп'
-  },
-  {
-    url: 'https://www.atbmarket.com/product/morozivo-90g-lasunka-plombir-ice-cake-zi-smvanili-ta-z-kakao-u-pecivi-ta-kondglaz-z-arah',
-    titleOpenTag: '<h1 class="page-title product-page__title">',
-    title:
-      'Морозиво 90г Ласунка пломбір Ice-Cake зі см.ванілі та з какао у печиві та конд.глаз. з арах.'
-  },
-  {
-    url: 'https://www.atbmarket.com/product/morozivo-100-g-oliver-smith-lakomij-plombir-u-zbitij-konditerskij-glazuri',
-    titleOpenTag: '<h1 class="page-title product-page__title">',
-    title: 'Морозиво 100  г Oliver Smith Лакомий пломбір у збитій кондитерській глазурі'
-  },
-  {
-    url: 'https://www.atbmarket.com/product/ikra-310-g-veres-z-kabackiv-ekstra-skbanka',
-    titleOpenTag: '<h1 class="page-title product-page__title">',
-    title: 'Ікра 310 г Верес з кабачків Екстра ск/банка'
-  }
-]
-
-monitor().catch((error) => console.log(error))
+//monitor().catch((error) => console.log(error))
 
 cron.schedule(runTimeRange, () => {
-    logMessage()
-    monitor()
+  logMessage()
+  monitor()
 })
 function logMessage() {
   console.log('Cron job executed at:', new Date().toLocaleString())
 }
 
-async function monitor() {
-    const goodsExtractionService = new GoodsExtractionService()
-    const values = await Promise.all(
-        goodsInitial.map(({ url, titleOpenTag, title }) => {
-            return goodsExtractionService.loadProductValues(url, titleOpenTag.concat(title))
-        })
-    )
-    let index = 0
-    const updatedGoods = goodsInitial.map(({ url, title }) => {
-        const goodInfo = `${url}  : ${values[index]}`
-        if (typeof values[index] === 'object' && values[index]?.length > 1) {
-            telegram.log(goodInfo)
-        }
-        index++
-        return goodInfo
+async function getProducts() {
+  return await goodsStoreService.getAllProducts()
+}
+
+ function getActualGoodsInfo(goodsInitial) {
+  const goodsExtractionService = new GoodsExtractionService()
+  return Promise.all(
+    goodsInitial.map(({ url, titleOpenTag, title }) => {
+      return goodsExtractionService.loadProductInfo(url, titleOpenTag.concat(title))
     })
-    console.log({ updatedGoods })
-    return updatedGoods
+  )
+}
+
+/**
+ * Monitors the initial products and updates them based on the actual product information.
+ *
+ * @return {Promise<Array<string>>} An array of strings containing the updated product information.
+ */
+async function monitor() {
+  const goodsInitial = await getProducts()
+  const actualInfo = await getActualGoodsInfo(goodsInitial)
+
+  const updatedGoods = goodsInitial.map(async ({ url, title, prices, status }, index) => {
+    const goodInfo = `${url}  : ${actualInfo[index].status} ${actualInfo[index]?.prices || ''}`
+    if (actualInfo[index]?.prices &&
+      actualInfo[index].prices?.length > 1 &&
+      prices?.toString() !== actualInfo[index].prices.toString()
+    ) {
+      processDiscountedProduct(url, goodInfo, actualInfo[index])
+    } else if (status !== actualInfo[index].status) { //if no discount but status updated
+      processUpdatedProduct(url, goodInfo, actualInfo[index])
+    }
+    return goodInfo
+  })
+  return await Promise.all(updatedGoods)
+}
+
+function processDiscountedProduct(url, goodInfo, { prices, status }) {
+  telegram.log(goodInfo)
+  goodsStoreService.updateProductsInStorage(url, { prices })
+  goodsStoreService.updateProductsInStorage(url, { status })
+}
+
+function processUpdatedProduct(url, goodInfo, { status }) {
+  telegram.log(goodInfo)
+  goodsStoreService.updateProductsInStorage(url, { status })
 }
 
 app.get('/', async (req, res) => {
-    res.send(await monitor())
+  res.send(await monitor())
+})
+
+app.get('/add', async (req, res) => {
+  res.sendFile( path.join(__dirname, 'public', 'addNew.html'))
+})
+
+app.post('/addNewProduct', async (req, res) => {
+  const { url, title, titleOpenTag } = req.body
+  console.log({ url, title, titleOpenTag })
+  await goodsStoreService.addNewProduct(url, title, titleOpenTag)
+  // res.redirect('/')
 })
 
 app.listen(port, async () => {
   console.log(port + ' is listening ok!!! ')
 })
+
