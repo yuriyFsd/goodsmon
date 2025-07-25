@@ -6,8 +6,15 @@ import path from 'path'
 import bodyParser from 'body-parser'
 import { fileURLToPath } from 'url'
 const app = express()
+app.use(express.urlencoded({ extended: true }));
+
 import { GoodsExtractionService } from './services/goods.extraction.service.js'
 import { GoodsStoreService } from './services/goods.store.service.js'
+
+import path from 'path'
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 //import { server } from './api/index.js'
 import auxiliaryApi from './api/routes/auxiliary.js'
 import telegram from './services/telegram.js'
@@ -67,7 +74,7 @@ async function monitor() {
     const goodInfo = `${url}  : ${actualInfo[index].status} ${actualInfo[index]?.prices || ''}`
     if (actualInfo[index]?.prices &&
       actualInfo[index].prices?.length > 1 &&
-      prices.toString() !== actualInfo[index].prices.toString()
+      prices?.toString() !== actualInfo[index].prices.toString()
     ) {
       processDiscountedProduct(url, goodInfo, actualInfo[index])
     } else if (status !== actualInfo[index].status) { //if no discount but status updated
@@ -93,6 +100,17 @@ app.get('/', async (req, res) => {
   res.send(await monitor())
 })
 
+app.get('/add', async (req, res) => {
+  res.sendFile( path.join(__dirname, 'public', 'addNew.html'))
+})
+
+app.post('/addNewProduct', async (req, res) => {
+  const { url, title, titleOpenTag } = req.body
+  console.log({ url, title, titleOpenTag })
+  await goodsStoreService.addNewProduct(url, title, titleOpenTag)
+  // res.redirect('/')
+})
+
 app.get('/test', (req, res) => {
    console.log(__dirname)
   res.sendFile(path.join(__dirname, 'public', '/test.html'))
@@ -113,3 +131,4 @@ app.post('/submit', (req, res) => {
 app.listen(port, async () => {
   console.log(port + ' is listening ok!!! ')
 })
+

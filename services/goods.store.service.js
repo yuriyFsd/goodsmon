@@ -12,6 +12,10 @@ export class GoodsStoreService {
     console.log({ just_updated_in_db: url, property })
     return this.goodsStoreMapper.updateProductByUrl(url, property)
   }
+
+  async addNewProduct(url, title, titleOpenTag) {
+    return this.goodsStoreMapper.addNewProduct(url, title, titleOpenTag)
+  }
 }
 
 // (async () => {
