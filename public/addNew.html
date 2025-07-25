@@ -1,14 +1,79 @@
 <html>
     <head>
         <title>addNewProduct</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background: #f7f7f9;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 400px;
+                margin: 40px auto;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                padding: 32px 28px 24px 28px;
+            }
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 24px;
+                font-size: 1.7em;
+                letter-spacing: 1px;
+            }
+            form div {
+                margin-bottom: 18px;
+            }
+            label {
+                display: block;
+                margin-bottom: 6px;
+                color: #444;
+                font-weight: 500;
+                font-size: 1em;
+            }
+            input[type="text"] {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 1em;
+                transition: border-color 0.2s;
+                box-sizing: border-box;
+            }
+            input[type="text"]:focus {
+                border-color: #007bff;
+                outline: none;
+            }
+            .required {
+                color: #e74c3c;
+                margin-right: 4px;
+            }
+            button[type="submit"] {
+                width: 100%;
+                background: #007bff;
+                color: #fff;
+                border: none;
+                padding: 12px 0;
+                border-radius: 4px;
+                font-size: 1.1em;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            button[type="submit"]:hover {
+                background: #0056b3;
+            }
+        </style>
     </head>
     <body>
-        <h1>addNewProduct</h1>
+        <h1>Add New Product From ATB  <a href="https://www.atbmarket.com/" target="_blank">https://www.atbmarket.com/</a></h1>
         <form action="/addNewProduct" method="POST">
-            <div><input type="text" name="url" placeholder="url"></div>
-            <div><input type="text" name="title" placeholder="title"></div>
-            <div><input type="text" name="titleOpenTag" placeholder="titleOpenTag"></div>
-            <div><button type="submit">Add</button></div>
+            <div>&nbsp&nbsp*reruired<input type="text" name="url" placeholder="url" required></div>
+            <div>&nbsp&nbsp*required<input type="text" name="title" placeholder="title" required></div>
+            <div>&nbsp&nbsp&nbsp&nbsp<input type="text" name="titleOpenTag" placeholder="titleOpenTag"></div>
+            <div><button type="submit">Add Item</button></div>
         </form>
     </body>
 </html>

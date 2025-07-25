@@ -14,6 +14,9 @@ export class GoodsStoreService {
   }
 
   async addNewProduct(url, title, titleOpenTag) {
+    const OPENTAG = '<h1 class="page-title product-page__title">'
+    titleOpenTag = titleOpenTag?.length > 1 ? titleOpenTag : OPENTAG
+    console.log({ titleOpenTag })
     return this.goodsStoreMapper.addNewProduct(url, title, titleOpenTag)
   }
 }
