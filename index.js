@@ -95,7 +95,7 @@ app.post('/addNewProduct', async (req, res) => {
   const { url, title, titleOpenTag } = req.body
   console.log({ url, title, titleOpenTag })
   await goodsStoreService.addNewProduct(url, title, titleOpenTag)
-  // res.redirect('/')
+  res.redirect('/')
 })
 
 app.listen(port, async () => {
