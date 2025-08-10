@@ -18,7 +18,10 @@ export class GoodsExtractionService {
 
     const httpClientService = new HttpClientService()
     const htmlSource = await httpClientService.getProductPageHtml(url)
+      .then(html => html)
+      .catch(err => console.log(err))
     //await writeFile('goods.html', htmlSource, 'utf8')
+    if(!htmlSource) return { status: 'Cannot reach market website' }
     if (this.isProductNonAvailable(htmlSource)) {
       return { status: 'Not available at the moment' }
     }
